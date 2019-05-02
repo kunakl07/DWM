@@ -1,0 +1,1268 @@
+CODE:
+import java.util.*;
+class tree
+{
+	public double hd, p;
+	char ch;
+	String parent;
+	tree(char c,int x)
+	{
+    	ch=c;
+    	if(x==1)
+        	parent="outlook";
+    	else if(x==2)
+        	parent="temperature";
+    	else if(x==3)
+        	parent="humidity";
+    	else if(x==4)
+        	parent="windy";
+	}//tree function
+}//class tree
+class d_tree
+{
+	static char outlook[]={'S','S','O','R','R','R','O','S','S','R','S','O','O','R'};
+	static char temperature[]={'B','B','B','M','C','C','C','M','C','M','M','M','B','M'};
+	static char humidity[]={'H','H','H','H','N','N','N','H','N','N','N','H','N','H'};
+	static char windy[]={'F','T','F','F','F','T','T','F','F','F','T','T','F','T'};
+	static char class1[]={'N','N','P','P','P','N','P','N','P','P','P','P','P','N'};
+	static double G1,G2,G3,G4, HD, temp1,temp2;
+	static double play=9.0/14.0;
+	static double nplay=5.0/14.0;
+	static int row=0,column=0;
+	static char classify[][]=new char[10][10];
+
+	static tree cal_hd(tree t,int choice)
+	{
+    	double count1=0,count2=0;
+    	if(choice==1)
+    	{
+        	for(int i=0;i<14;++i)
+        	{
+            	if(t.ch==outlook[i] && class1[i]=='P')
+                	++count1;
+            	else if(t.ch==outlook[i] && class1[i]=='N')
+                	++count2;
+        	}//for
+    	}//if
+    	if(choice==2)
+    	{
+        	for(int i=0;i<14;++i)
+        	{
+            	if(t.ch==temperature[i] && class1[i]=='P')
+                	++count1;
+            	else if(t.ch==temperature[i] && class1[i]=='N')
+                	++count2;
+        	}//for
+    	}//if
+    	if(choice==3)
+    	{
+        	for(int i=0;i<14;++i)
+        	{
+            	if(t.ch==humidity[i] && class1[i]=='P')
+                	++count1;
+            	else if(t.ch==humidity[i] && class1[i]=='N')
+                	++count2;
+        	}//for
+    	}//if
+    	if(choice==4)
+    	{
+        	for(int i=0;i<14;++i)
+        	{
+            	if(t.ch==windy[i] && class1[i]=='P')
+                	++count1;
+            	else if(t.ch==windy[i] && class1[i]=='N')
+                	++count2;
+        	}//for
+    	}//if
+    	temp1=count1/(count1+count2);
+    	temp2=count2/(count1+count2);
+    	t.p=(count1+count2)/14;
+    	if(temp1==0 || temp2==0)
+        	t.hd=0;
+    	else
+        	t.hd=temp1*(Math.log(1/temp1)/Math.log(10))+temp2*(Math.log(1/temp2)/Math.log(10));
+    	return t;
+	}//cal_hd function ends here
+	static int check_if_equal(char ca[][],int cnt)
+	{
+    	int count1=0,count2=0,count3=0;
+    	char c1=ca[0][0],c2=ca[0][1],c3=ca[0][2];
+    	for(int i=0;i<cnt;++i)
+    	{
+        	if(ca[i][0]==c1)
+            	++count1;
+        	if(ca[i][1]==c2)
+            	++count2;
+        	if(ca[i][2]==c3)
+            	++count3;
+    	}//for
+    	if(count1==cnt)
+        	return 0;
+    	else if(count2==cnt)
+        	return 1;
+    	else if(count3==cnt)
+        	return 2;
+    	else
+        	return -1;
+	}//check_if_equal function ends here
+	static void compute(char ch)
+	{
+    	char ca1[][]=new char[10][10];
+    	char ca2[][]=new char[10][10];
+    	char ca3[][]=new char[10][10];
+    	int cnt1=0;
+    	int cnt2=0;
+    	for(int i=0;i<14;++i)
+    	{
+        	if(outlook[i]==ch)
+        	{
+            	ca1[cnt1][0]=temperature[i];
+            	ca1[cnt1][1]=humidity[i];
+            	ca1[cnt1][2]=windy[i];
+            	ca1[cnt1][3]=class1[i];
+            	++cnt1;
+        	}//if
+    	}//for
+    	int check1=0,check2=0;
+    	for(int i=0;i<cnt1;++i)
+    	{
+        	if(ca1[i][3]=='P')
+            	++check1;
+        	else if(ca1[i][3]=='N')
+         	++check2;
+        	if(check1==cnt1)
+        	{
+            	classify[row][column++]=ch;
+            	classify[row][column++]='P';
+            	System.out.print("--------->PLAY");
+            	return;
+        	}//if
+        	else if(check2==cnt1)
+        	{
+            	classify[row][column++]=ch;
+            	classify[row][column++]='N';
+            	System.out.print("--------->NO PLAY");
+            	return;
+        	}//else if
+    	}//end of for loop
+    	cnt1=0;
+    	for(int i=0;i<10;++i)
+    	{
+        	if(ca1[i][3]=='P')
+        	{
+            	ca2[cnt1][0]=ca1[i][0];
+            	ca2[cnt1][1]=ca1[i][1];
+            	ca2[cnt1][2]=ca1[i][2];
+            	ca2[cnt1][3]=ca1[i][3];
+            	++cnt1;
+        	}//if
+    	}//for
+    	classify[row][column++]=ch;
+    	int z=check_if_equal(ca2,cnt1);
+    	if(z==0)
+    	{
+        	System.out.print("\n--------->TEMPERATURE("+ca2[0][0]+")--------->PLAY\n");
+        	classify[row][column++]=ca2[0][0];
+        	classify[row][column++]='P';
+    	}//if
+    	else if(z==1)
+    	{
+        	System.out.print("\n--------->HUMIDITY("+ca2[0][1]+")--------->PLAY\n");
+        	classify[row][column++]=ca2[0][1];
+        	classify[row][column++]='P';
+    	}//else if
+    	else if(z==2)
+    	{
+        	System.out.print("\n--------->WINDY("+ca2[0][2]+")--------->PLAY\n");
+        	classify[row][column++]=ca2[0][2];
+        	classify[row][column++]='P';
+    	}//else if
+    	cnt1=0;
+    	for(int i=0;i<10;++i)
+    	{
+        	if(ca1[i][3]=='N')
+        	{
+            	ca3[cnt1][0]=ca1[i][0];
+            	ca3[cnt1][1]=ca1[i][1];
+            	ca3[cnt1][2]=ca1[i][2];
+            	ca3[cnt1][3]=ca1[i][3];
+            	++cnt1;
+        	}//if
+    	}//for
+    	++row;
+    	column=0;
+    	classify[row][column++]=ch;
+    	z=check_if_equal(ca3,cnt1);
+    	if(z==0)
+    	{
+        	System.out.print("--------->TEMPERATURE("+ca3[0][0]+")--------->NO PLAY");
+        	classify[row][column++]=ca3[0][0];
+        	classify[row][column++]='N';
+    	}//if
+    	else if(z==1)
+    	{
+        	System.out.print("--------->HUMIDITY("+ca3[0][1]+")--------->NO PLAY");
+        	classify[row][column++]=ca3[0][1];
+        	classify[row][column++]='N';
+    	}//if
+    	else if(z==2)
+    	{
+        	System.out.print("--------->WINDY("+ca3[0][2]+")--------->NO PLAY");
+        	classify[row][column++]=ca3[0][2];
+        	classify[row][column++]='N';
+    	}//if
+	}//compute function
+	public static void main(String args[])
+	{
+    	Scanner scr=new Scanner(System.in);
+    	HD=play*(Math.log(1/play)/Math.log(10))+nplay*(Math.log(1/nplay)/Math.log(10));
+    	System.out.println("\nThe value of H(D) is "+HD);
+
+    	tree sunny=new tree('S',1);
+    	tree overcast=new tree('O',1);
+    	tree rain=new tree('R',1);
+    	tree hot=new tree('B',2);
+    	tree mild=new tree('M',2);
+    	tree cool=new tree('C',2);
+    	tree high=new tree('H',3);
+    	tree normal=new tree('N',3);
+    	tree tru=new tree('T',4);
+    	tree fal=new tree('F',4);
+
+    	sunny=cal_hd(sunny,1);
+    	overcast=cal_hd(overcast,1);
+    	rain=cal_hd(rain,1);
+    	hot=cal_hd(hot,2);
+    	mild=cal_hd(mild,2);
+    	cool=cal_hd(cool,2);
+    	high=cal_hd(high,3);
+    	normal=cal_hd(normal,3);
+    	tru=cal_hd(tru,4);
+    	fal=cal_hd(fal,4);
+
+    	G1=HD-(sunny.p*sunny.hd+overcast.p*overcast.hd+rain.p*rain.hd);
+    	G2=HD-(hot.p*hot.hd+mild.p*mild.hd+cool.p*cool.hd);
+    	G3=HD-(high.p*high.hd+normal.p*normal.hd);
+    	G4=HD-(tru.p*tru.hd+fal.p*fal.hd);
+
+    	int gflag=0;
+
+    	System.out.println("\nGain(D,Outlook)= "+G1 +"\nGain(D,Temperature)= "+G2+"\nGain(D,Humidity)= "+G3+"\nGain(D,Windy)= "+G4);
+    	System.out.print("\nThe Splitting factor is ");
+    	if(G1>G2 && G1>G3 && G1>G4)
+        	System.out.println("Outlook");
+    	else if(G2>G1 && G2>G3 && G2>G4)
+        	System.out.println("Temperature");
+    	else if(G3>G2 && G3>G1 && G3>G4)
+        	System.out.println("Humidity");
+    	else if(G4>G2 && G4>G3 && G4>G1)
+        	System.out.println("Windy");
+
+    	System.out.println("\nThe Tree is as follows:-");
+    	System.out.print("\nOUTLOOK(S)");
+    	compute('S');
+    	++row;
+    	column=0;
+    	System.out.print("\n\n\nOUTLOOK(O)");
+    	compute('O');
+    	++row;
+    	column=0;
+    	System.out.print("\n\n\nOUTLOOK(R)");
+    	compute('R');
+
+    	char input[]=new char[4];
+    	String s;
+
+    	System.out.println("\nMenu:\n\nOutlook: Sunny=S Overcast=O Rainy=R\n\nTemperature: Hot=B Medium=M Cool=C\n\nHumidity: High=H Normal=N\n\nWindy: True=T False=F");
+
+    	System.out.println("\n\nEnter your new tuple to be classified ");
+    	System.out.print("\nOutlook(S/O/R)= ");
+    	s=scr.nextLine();
+    	input[0]=s.charAt(0);
+    	System.out.print("\nTemperature(B/M/C)= ");
+    	s=scr.nextLine();
+    	input[1]=s.charAt(0);
+    	System.out.print("\nHumidity(H/N)= ");
+    	s=scr.nextLine();
+    	input[2]=s.charAt(0);
+    	System.out.print("\nWindy(T/F)= ");
+    	s=scr.nextLine();
+    	input[3]=s.charAt(0);
+    	System.out.print("Your input is ");
+    	for(int i=0;i<4;++i)
+        	System.out.print(" "+input[i]);
+    	int inc1=0;
+    	do
+    	{
+        	if(input[0]==classify[inc1][0])
+        	{
+            	if(classify[inc1][1]=='P')
+            	{
+                	System.out.println("\n\nTuple classified as PLAY");
+                	break;
+            	}//if
+            	else if(input[1]==classify[inc1][1] || input[2]==classify[inc1][1] || input[3]==classify[inc1][1])
+            	{
+               	if(classify[inc1][2]=='P')
+               	{
+                   	System.out.println("\n\nTuple classified as PLAY");
+                   	break;
+               	}//if
+               	else if(classify[inc1][2]=='N')
+               	{
+                   	System.out.println("\n\nTuple classified as NO PLAY");
+                   	break;
+               	}//else if
+            	}//outer else if
+        	}//outer if
+        	++inc1;
+    	}//do loop
+    	while(true);
+	}//main
+};//class d_tree ends here
+
+output:
+
+d50112@d50112-ThinkCentre-M720t:~$ javac d_tree.java
+d50112@d50112-ThinkCentre-M720t:~$ java d_tree
+
+The value of H(D) is 0.2830542780615224
+
+Gain(D,Outlook)= 0.07427909717678749
+Gain(D,Temperature)= 0.00879686881360553
+Gain(D,Humidity)= 0.04570704031674405
+Gain(D,Windy)= 0.014487679755121663
+
+The Splitting factor is Outlook
+
+The Tree is as follows:-
+
+OUTLOOK(S)
+--------->HUMIDITY(N)--------->PLAY
+--------->HUMIDITY(H)--------->NO PLAY
+
+
+OUTLOOK(O)--------->PLAY
+
+
+OUTLOOK(R)
+--------->WINDY(F)--------->PLAY
+--------->WINDY(T)--------->NO PLAY
+Menu:
+
+Outlook: Sunny=S Overcast=O Rainy=R
+
+Temperature: Hot=B Medium=M Cool=C
+
+Humidity: High=H Normal=N
+
+Windy: True=T False=F
+
+
+Enter your new tuple to be classified 
+
+Outlook(S/O/R)= S
+
+Temperature(B/M/C)= M
+
+Humidity(H/N)= H
+
+Windy(T/F)= T
+Your input is  S M H T
+
+Tuple classified as NO PLAY
+d50112@d50112-ThinkCentre-M720t:~$ java d_tree
+
+The value of H(D) is 0.2830542780615224
+
+Gain(D,Outlook)= 0.07427909717678749
+Gain(D,Temperature)= 0.00879686881360553
+Gain(D,Humidity)= 0.04570704031674405
+Gain(D,Windy)= 0.014487679755121663
+
+The Splitting factor is Outlook
+
+The Tree is as follows:-
+
+OUTLOOK(S)
+--------->HUMIDITY(N)--------->PLAY
+--------->HUMIDITY(H)--------->NO PLAY
+
+
+OUTLOOK(O)--------->PLAY
+
+
+OUTLOOK(R)
+--------->WINDY(F)--------->PLAY
+--------->WINDY(T)--------->NO PLAY
+Menu:
+
+Outlook: Sunny=S Overcast=O Rainy=R
+
+Temperature: Hot=B Medium=M Cool=C
+
+Humidity: High=H Normal=N
+
+Windy: True=T False=F
+
+
+Enter your new tuple to be classified 
+
+Outlook(S/O/R)= S
+
+Temperature(B/M/C)= C
+
+Humidity(H/N)= N
+
+Windy(T/F)= F
+Your input is  S C N F
+
+Tuple classified as PLAY
+
+
+
+
+
+
+
+CODE:
+#include <stdio.h>
+	#include <math.h>
+	int main()
+	{
+	float xx[20],yy[20],nr=0,dr=0;
+	int i,n;
+	float x[20],y[20];	//float x[5]={60,61,62,63,65},y[5]={3.1,3.6,3.8,4.0,4.1};
+	float xip,yop;
+	printf("Enter the number of observations:\n");
+	scanf("%d",&n);
+	printf("Enter the values of x:\n");
+	for(int i=0;i<n;i++)
+		scanf("%f",&x[i]);
+	printf("Enter the values of y:\n");
+	for(int i=0;i<n;i++)
+		scanf("%f",&y[i]);
+	double sum_y=0,sum_xy=0,sum_x=0,sum_xx=0,sum_x2=0,slope=0,intercept=0,reg;
+	for(i=0;i<n;i++)//calculate xi square and yi square
+	{
+			xx[i]=x[i]*x[i];
+			yy[i]=y[i]*y[i];
+	}//for
+	for(i=0;i<n;i++)
+	{
+			sum_x+=x[i];//calculate summation of xi
+			sum_y+=y[i];//calculate summation of yi
+			sum_xx+= xx[i];//calculate summation of xi square
+			sum_xy+= x[i]*y[i];//calculate summation of deviation
+	}//for
+	//calculate regression slope
+	nr=(n*sum_xy)-(sum_x*sum_y);
+	sum_x2=sum_x*sum_x;
+	dr=(n*sum_xx)-sum_x2;
+	slope=nr/dr;
+	//calculate regression coefficient
+	double fac = pow(10, 2);	//printf("\nfac=%f\n",fac);
+	slope=round(slope*fac)/fac;  	 //printf("\nslope=%f\n",slope);
+	intercept=(sum_y- slope*sum_x)/n;
+	reg= intercept + (slope*64);
+	printf("\nSlope: %.2f\nIntercept: %.3f\nRegression: %.3f\n",slope,intercept,reg);
+	printf("\nLinear Regression Equation: y=%.2fx+%.3f\n",slope,intercept);
+	printf("\nEnter a value of x:\n");
+	scanf("%f",&xip);
+	yop=(slope*xip)+intercept;
+	printf("\nThe value of y from Linear Regression equation will be:\ny=%.3f\n",yop);
+	return 0;
+	} 
+
+OUTPUT
+d50113@d50113-ThinkCentre-M720t:~$ gcc lr.c
+d50113@d50113-ThinkCentre-M720t:~$ ./a.out
+Enter the number of observations:
+5
+Enter the values of x:
+1
+2
+3
+4
+5
+Enter the values of y:
+1
+2
+3
+4
+5
+
+Slope: 1.00
+Intercept: 0.000
+Regression: 64.000
+
+Linear Regression Equation: y=1.00x+0.000
+
+Enter a value of x:
+4
+
+The value of y from Linear Regression equation will be:
+y=4.000
+d50113@d50113-ThinkCentre-M720t:~$ ./a.out
+Enter the number of observations:
+5
+Enter the values of x:
+-1
+-2
+-3
+-4
+-5
+Enter the values of y:
+-1
+-2
+-3
+-4
+-5
+
+Slope: 1.00
+Intercept: 0.000
+Regression: 64.000
+
+Linear Regression Equation: y=1.00x+0.000
+
+Enter a value of x:
+-9
+
+The value of y from Linear Regression equation will be:
+y=-9.000
+d50113@d50113-ThinkCentre-M720t:~$ ./a.out
+Enter the number of observations:
+6
+Enter the values of x:
+10
+20
+30
+10
+20
+10
+Enter the values of y:
+15
+25
+40
+10
+20
+10
+
+Slope: 1.35
+Intercept: -2.500
+Regression: 83.900
+
+Linear Regression Equation: y=1.35x+-2.500
+
+Enter a value of x:
+15
+
+The value of y from Linear Regression equation will be:
+y=17.750
+
+
+
+
+
+
+
+
+
+
+
+
+Code
+import java.util.Scanner;
+public class Kmean
+{
+public static void main(String args[])
+{
+	 Scanner s=new Scanner(System.in);
+//	 int arr[] = {2, 3,4,10,11,12,20,25,30}; // initial data    //{2, 3,4,10,11,12,20,25,30}; //{2, 3,4,6,6,8,10,11,12,14,15};
+	
+	  System.out.print("Enter no. of elements you want in array:");
+	  int len = s.nextInt();
+int arr[] = new int[len];
+System.out.println("Enter all the elements:");
+for(int i = 0; i < len; i++)
+arr[i] = s.nextInt();
+	
+	 int i, m1, m2, a, b, n = 0;
+	 boolean flag;//to check if m1 & m2 values of 2 iterations are equal
+	 float sum1, sum2;
+	 //Assume m1 and m2 values 
+	 a = arr[0];
+	 b = arr[1];
+	 m1 = a;//first element
+	 m2 = b;//second element
+	 int cluster1[] = new int[arr.length], cluster2[] = new int[arr.length];//declare clusters as array of integers
+	 do
+	 {
+		sum1 = 0;//sum1 & sum2 is sum of values in the clusters
+		sum2 = 0;
+		cluster1 = new int[arr.length];
+		cluster2 = new int[arr.length];
+		n++;
+		int k = 0, j = 0;//k is no. of elements assigned iun cluster 1, j for cluster 2
+		//assign element to clusters
+		for (i = 0; i < arr.length; i++)
+		{
+		if (Math.abs(arr[i] - m1) <= Math.abs(arr[i] - m2)) //nearer to mean of cluster 1
+		{
+		cluster1[k] = arr[i];
+		k++;
+		}
+		else
+		{
+		cluster2[j] = arr[i];
+		j++;
+		}
+		}//for
+		
+		//colculate mean value for clusters
+		System.out.println();
+		for (i = 0; i < k; i++)
+		{
+		sum1 = sum1 + cluster1[i];
+		}
+		for (i = 0; i < j; i++)
+		{
+		sum2 = sum2 + cluster2[i];
+		}
+		//printing Centroids/Means
+		System.out.println("m1=" + m1 + "   m2=" + m2);
+		//store old value of centroid
+		a = m1;
+		b = m2;
+		//calculate new value of centroid
+		m1 = Math.round(sum1 / k);
+		m2 = Math.round(sum2 / j);
+		flag = !(m1 == a && m2 == b);//till new centroid & previous centroid are not same, repeat process
+
+		 System.out.println("After iteration " + n + " , cluster 1 :\n");	//printing the clusters of each iteration
+		for (i = 0; i < cluster1.length; i++)
+		{
+		System.out.print(cluster1[i] + "\t");
+		}
+
+		System.out.println("\n");
+		System.out.println("After iteration " + n + " , cluster 2 :\n");
+		for (i = 0; i < cluster2.length; i++)
+		{
+		System.out.print(cluster2[i] + "\t");
+		}
+
+	 } while (flag);
+
+	 System.out.println("\n Final cluster 1 :\n");        	// final clusters
+	 for (i = 0; i < cluster1.length; i++)
+	 {
+		System.out.print(cluster1[i] + "\t");
+	 }
+
+	 System.out.println("\nFinal cluster 2 :\n");
+	 for (i = 0; i < cluster2.length; i++)
+	 {
+		System.out.print(cluster2[i] + "\t");
+	 }
+}//main
+}//class
+
+
+OUTPUT
+d50102@d50102-ThinkCentre-M720t:~$ javac Kmean.java
+d50102@d50102-ThinkCentre-M720t:~$ java Kmean
+
+m1=2   m2=3
+After iteration 1 , cluster 1 :
+
+2    0    0    0    0    0    0    0    0    
+
+After iteration 1 , cluster 2 :
+
+3    4    10    11    12    20    25    30    0    
+m1=2   m2=14
+After iteration 2 , cluster 1 :
+
+2    3    4    0    0    0    0    0    0    
+
+After iteration 2 , cluster 2 :
+
+10    11    12    20    25    30    0    0    0    
+m1=3   m2=18
+After iteration 3 , cluster 1 :
+
+2    3    4    10    0    0    0    0    0    
+
+After iteration 3 , cluster 2 :
+
+11    12    20    25    30    0    0    0    0    
+m1=5   m2=20
+After iteration 4 , cluster 1 :
+
+2    3    4    10    11    12    0    0    0    
+
+After iteration 4 , cluster 2 :
+
+20    25    30    0    0    0    0    0    0    
+m1=7   m2=25
+After iteration 5 , cluster 1 :
+
+2    3    4    10    11    12    0    0    0    
+
+After iteration 5 , cluster 2 :
+
+20    25    30    0    0    0    0    0    0    
+Final cluster 1 :
+
+2    3    4    10    11    12    0    0    0    
+Final cluster 2 :
+
+20    25    30    0    0    0    0    0    0	
+
+
+
+
+
+
+HITS
+
+
+
+#include<stdio.h>
+#include<math.h>
+#include<stdlib.h>
+void main()
+{
+	int i,j,k,n,a,it,t,count;
+	float sum=0,sum1=0,s=0,s1=0, v,u;
+	//To get input
+	printf("\nEnter the number of nodes: ");
+	scanf("%d",&n);
+	float ip[n][n],out[n],in[n],ipt[n][n],multiply[n][n],multiply1[n][n];
+	printf("\nEnter the links. If there is a node from A -> B: enter 1.");
+	for(i=0;i<n;i++)//1 node
+	{
+		a=65;//ASCII of letter A
+		for(j=0;j<n;j++)//compare it with other nodes
+		{
+			printf("\n%c->%c: ",a+i,a+j);
+			scanf("%f",&ip[i][j]);
+		}//inner for
+	}//outer for
+	
+	float iden[4][1]={1,1,1,1};//identity matrix
+	
+	//To print the input
+	printf("\nINPUT MATRIX:\n");
+	a=65;
+	printf("\t");
+	for(j=0;j<n;j++)//print column headings
+		printf("%c\t",a+j);
+	for(i=0;i<n;i++)
+	{
+		a=65;
+		printf("\n%c",a+i);//print row heading
+		for(k=0;k<n;k++)//print entry of link between row to column
+			printf("\t%.2f",ip[i][k]);
+	}//for loop
+	
+	//to calculate ip transpose
+	for(i=0;i<n;i++)
+	{
+		for(j=0;j<n;j++)//store transpose of ip[][] in new matrix ipt[][]
+			ipt[i][j]=ip[j][i];//exchange rows & columns for transpose
+	}//for loop
+
+	//To ask the number of iterations
+	printf("\nEnter the number of iterations desired: ");
+	scanf("%d",&it);
+	
+	k=1;//first iteration
+	while(k<=it)
+	{
+		//To calculate indegree and outdegree
+		for(i=0;i<n;i++)// for 1 node
+		{
+			//initialise indegree and outdegree value to 0
+			out[i]=0;
+			in[i]=0;
+			
+			for(j=0;j<n;j++)// check it with other nodes
+			{
+				if(ip[i][j]==1)
+					out[i]++;
+				if(ip[j][i]==1)
+					in[i]++;
+			}//inner for
+		}//outer for
+		k++;	// 1 iteration is completed
+		
+		//Calculate V, U
+		for (i = 0; i < n; i++) 
+		{
+			for (j = 0; j < 1; j++) 
+			{
+				for (t = 0; t < n; t++) 
+					{	sum = sum + ipt[i][t]*iden[t][j];	}//for loop of t
+				multiply[i][j] = sum;
+				sum = 0;//reset value for next node
+			}//for loop of j
+		}//for loop of i
+		
+		for (i = 0; i < n; i++) 
+		{
+			for (j = 0; j < 1; j++) 
+			{
+				for (t = 0; t < n; t++) 
+					{sum1= sum1 + ip[i][t]*multiply[t][j];	}//for loop of t
+				multiply1[i][j] = sum1;
+				sum1 = 0;//reset value for next node
+			}//for loop of j
+		}//for loop of i
+		
+		//To calculate new authority and hub
+		for(i=0;i<n;i++)
+		{
+			for(j=0;j<1;j++)
+			{
+				s=s+(multiply[i][j]*multiply[i][j]);
+				s1=s1+(multiply1[i][j]*multiply1[i][j]);
+			}//inner for loop
+		}//outer for loop
+		
+		printf("\nNew Hub: ");
+		for(i=0;i<n;i++)
+		{
+			for(j=0;j<1;j++)
+			{
+				multiply[i][j]=multiply[i][j]/sqrt(s);
+				printf("\n%c=%.2f",65+i,multiply[i][j]);
+			}//inner for loop
+		}//outer for loop
+		
+		printf("\nNew Authority:");
+		for(i=0;i<n;i++)
+		{
+			for(j=0;j<1;j++)
+			{
+				multiply1[i][j]=multiply1[i][j]/sqrt(s1);
+				printf("\n%c=%.2f",65+i,multiply1[i][j]);
+			}//inner for loop
+		}//outer for loop
+	}//while
+}//main() function ends here
+
+
+
+Page Rank
+
+
+
+CODE:
+import java.util.*;
+import java.io.*;
+public class PageRank
+{
+public int path[][] = new int[10][10];//adjacency matrix
+public double pagerank[] = new double[10];//array to store pagerank
+public void calc(double totalNodes)
+{
+	
+double InitialPageRank, OutgoingLinks=0, DampingFactor = 0.85, TempPageRank[] = new double[10];
+int ExternalNodeNumber, InternalNodeNumber, k=1, ITERATION_STEP=1;; // k For Traversing
+		
+InitialPageRank = 1/totalNodes;
+System.out.printf(" Total Number of Nodes :"+totalNodes+"\t Initial PageRank  of All Nodes :"+InitialPageRank+"\n");
+			
+// 0th ITERATION  _ OR _ INITIALIZATION PHASE
+for(k=1;k<=totalNodes;k++)
+this.pagerank[k]=InitialPageRank;  //store initial pagerank of all pages in the pagerank array
+			
+System.out.printf("\n Initial PageRank Values , 0th Step \n");
+for(k=1;k<=totalNodes;k++)
+System.out.printf(" Page Rank of "+k+" is :\t"+this.pagerank[k]+"\n");
+			
+while(ITERATION_STEP<=2) // Iterations
+{
+// Store the PageRank for All Nodes in Temporary Array
+for(k=1;k<=totalNodes;k++)
+{  
+TempPageRank[k]=this.pagerank[k];
+this.pagerank[k]=0;//set to zero for new page
+}//for
+						
+for(InternalNodeNumber=1;InternalNodeNumber<=totalNodes;InternalNodeNumber++)
+{
+for(ExternalNodeNumber=1;ExternalNodeNumber<=totalNodes;ExternalNodeNumber++)
+{
+if(this.path[ExternalNodeNumber][InternalNodeNumber] == 1)//there is an outgoing edge
+{
+k=1;
+OutgoingLinks=0;  // Count the Number of Outgoing Links for each ExternalNodeNumber
+while(k<=totalNodes)
+{
+if(this.path[ExternalNodeNumber][k] == 1 )
+{
+OutgoingLinks=OutgoingLinks+1; // Counter for Outgoing Links
+}//if
+k=k+1;  
+}//while
+// Calculate PageRank	
+this.pagerank[InternalNodeNumber]+=TempPageRank[ExternalNodeNumber]*(1/OutgoingLinks); //page rank of node is sum of (page rank of nodes that point to it/no. of outgoing links from the node that point to it)
+}//if: edge between external & internal node
+}//inner for: ExternalNodeNumber
+}//outer for: InternalNodeNumber
+						
+System.out.printf("\n After "+ITERATION_STEP+"th Step \n");
+for(k=1;k<=totalNodes;k++)
+System.out.printf(" Page Rank of "+k+" is :\t"+this.pagerank[k]+"\n");
+					
+ITERATION_STEP = ITERATION_STEP+1;
+}//while
+// Add the Damping Factor to PageRank
+for(k=1;k<=totalNodes;k++)
+this.pagerank[k]=(1-DampingFactor)+ DampingFactor*this.pagerank[k];  
+			
+// Display PageRank
+System.out.printf("\n Final Page Rank : \n");
+for(k=1;k<=totalNodes;k++)
+System.out.printf(" Page Rank of "+k+" is :\t"+this.pagerank[k]+"\n");
+			
+			
+}//calc function
+
+public static void main(String args[])
+{
+int nodes,i,j,cost;
+Scanner in = new Scanner(System.in);
+System.out.println("Enter the Number of WebPages \n");
+nodes = in.nextInt();
+PageRank p = new PageRank();
+System.out.println("Enter the Adjacency Matrix with 1->PATH & 0->NO PATH Between two WebPages: \n");
+for(i=1;i<=nodes;i++)//no. of rows
+for(j=1;j<=nodes;j++)//no. of columns
+{
+p.path[i][j]=in.nextInt();
+if(j==i)//no cycle from node to itself
+p.path[i][j]=0;
+}//inner for
+p.calc(nodes);//call calc() function
+}//main  
+}//class
+
+OUTPUT
+d50102@d50102-ThinkCentre-M720t:~$ javac PageRank.java
+d50102@d50102-ThinkCentre-M720t:~$ java PageRank
+Enter the Number of WebPages
+
+5
+Enter the Adjacency Matrix with 1->PATH & 0->NO PATH Between two WebPages:
+
+0 1 0 0 0
+0 0 0 0 1
+1 1 0 1 1
+0 0 1 0 1
+0 0 0 1 0
+Total Number of Nodes :5.0     Initial PageRank  of All Nodes :0.2
+
+Initial PageRank Values , 0th Step
+Page Rank of 1 is :    0.2
+Page Rank of 2 is :    0.2
+Page Rank of 3 is :    0.2
+Page Rank of 4 is :    0.2
+Page Rank of 5 is :    0.2
+
+After 1th Step
+Page Rank of 1 is :    0.05
+Page Rank of 2 is :    0.25
+Page Rank of 3 is :    0.1
+Page Rank of 4 is :    0.25
+Page Rank of 5 is :    0.35
+
+After 2th Step
+Page Rank of 1 is :    0.025
+Page Rank of 2 is :    0.07500000000000001
+Page Rank of 3 is :    0.125
+Page Rank of 4 is :    0.375
+Page Rank of 5 is :    0.4
+
+Final Page Rank :
+Page Rank of 1 is :    0.17125
+Page Rank of 2 is :    0.21375000000000002
+Page Rank of 3 is :    0.25625000000000003
+Page Rank of 4 is :    0.46875
+Page Rank of 5 is :    0.49000000000000005
+
+
+
+
+import java.io.*;
+class apriori
+{ 
+public static void main(String []arg)throws IOException
+{
+int i,j,m=0;
+int t1=0;
+BufferedReader b=new BufferedReader(new InputStreamReader(System.in));
+System.out.println("Enter the number of transaction :");
+int n=Integer.parseInt(b.readLine());
+System.out.println("items :1--Milk 2--Bread 3--Coffee 4--Juice  5--Cookies  6--Jam");
+int item[][]=new int[n][6];
+for(i=0;i<n;i++)
+for(j=0;j<6;j++)
+item[i][j]=0;
+String[] itemlist={"MILK","BREAD","COFFEE","JUICE","COOKIES","JAM"};
+int nt[]=new int[6];
+int q[]=new int[6];
+for(i=0;i<n;i++)
+{ System.out.println("Transaction "+(i+1)+" :");
+for(j=0;j<6;j++)
+{  //System.out.println(itemlist[j]);
+System.out.println("Is Item "+itemlist[j]+" present in this transaction(1/0)? :");
+item[i][j]=Integer.parseInt(b.readLine()); 
+}
+}
+for(j=0;j<6;j++) 
+{ for(i=0;i<n;i++)
+{if(item[i][j]==1)
+nt[j]=nt[j]+1;
+}
+System.out.println("Number of Item "+itemlist[j]+" :"+nt[j]);
+}
+
+for(j=0;j<6;j++)
+{ if(((nt[j]/(float)n)*100)>=50)
+q[j]=1;
+else
+q[j]=0;
+
+if(q[j]==1)
+{t1++;
+System.out.println("Item "+itemlist[j]+" is selected "); 
+
+}
+}
+for(j=0;j<6;j++) 
+{ for(i=0;i<n;i++)
+{
+
+if(q[j]==0)
+{ 
+item[i][j]=0;
+}
+}
+}
+
+int nt1[][]=new int[6][6];
+for(j=0;j<6;j++) 
+{  for(m=j+1;m<6;m++) 
+{ for(i=0;i<n;i++)
+{ if(item[i][j]==1 &&item[i][m]==1)
+{ nt1[j][m]=nt1[j][m]+1;
+}
+}
+if(nt1[j][m]!=0)
+System.out.println("Number of Items of  "+itemlist[j]+"&"+itemlist[m]+" :"+nt1[j][m]);
+}
+
+}
+for(j=0;j<6;j++)
+{ for(m=j+1;m<6;m++) 
+{
+if(((nt1[j][m]/(float)n)*100)>=50)
+q[j]=1;
+else
+q[j]=0;
+
+if(q[j]==1)
+{
+System.out.println("Item "+itemlist[j]+"&"+itemlist[m]+" is selected "); 
+
+}
+}
+}
+} 
+}
+
+OUTPUT:
+
+comp@comp:~/Documents$ javac apriori.java
+comp@comp:~/Documents$ java apriori
+Enter the number of transaction :
+4
+
+
+Conversation opened. 1 read message.
+
+Skip to content
+Using Somaiya Vidyavihar Mail with screen readers
+
+8 of 4,251
+Fwd: d tree in c
+Inbox
+x
+
+PRIYAM PATEL <priyam.pp@somaiya.edu>
+Attachments
+Tue, Apr 30, 9:56 PM (21 hours ago)
+to DIVYANG, Dhruv, HARSHAL, PRASHANT, HARSHAD, me, DARSHIL
+
+
+---------- Forwarded message ---------
+From:Hiral Katira <hiralkatira3@gmail.com>
+Date: Tue, 30 Apr 2019, 3:55 p.m.
+Subject: Discussion tree in c
+To: <priyam.pp@somaiya.edu>
+
+
+
+
+
+
+
+
+           
+
+
+           
+Attachments area
+
+#include<stdio.h>
+#include<math.h>
+void main()
+{
+	int p = 0,n = 0;
+	float ipn, entropyage, gainage, ipnage[3] = {0,0,0}, entropycompi, gaincompi, ipcompi[2] = {0,0} , entropytype, gaintype, iptype[2] = {0,0};
+	int api[3] = {0, 0 ,0}, ani[3] = {0, 0 ,0}, cpi[3] = {0,0,0}, cni[3] = {0,0,0}, tpi[3] = {0,0,0}, tni[3] = {0,0,0};
+	char *age[10] = {"old", "old", "old", "mild", "mild", "mild", "mild", "New", "New", "New"};
+	char *competition[10] = {"yes", "no", "no", "yes", "yes", "no", "no", "yes", "no", "no"};
+	char *type[10] = {"sw", "sw", "hw", "sw", "hw", "hw", "sw", "sw", "hw", "sw"};
+	char *profit[10] = {"down", "down", "down", "down", "down", "up", "up", "up", "up", "up"};
+	for (int i = 0; i < 10; i++)
+	{
+		if(profit[i] == "down")
+			p++;
+		else
+			n++;
+	}
+	if(p == n)
+	{
+		ipn = 1;
+	}
+	else
+		ipn = -p/p+n * log(p/p+n) -n/p+n * log(n/p+n);
+	printf("Information gain(p,n) = %f \n",ipn);
+	printf("For age:\n");
+	for (int i = 0; i < 10; ++i)
+	{
+	 	if(age[i] == "old" && profit[i] == "up")
+	 		api[0]++;
+	 	else if(age[i] == "old" && profit[i] == "down")
+	 		ani[0]++;
+	 	if(age[i] == "mild" && profit[i] == "up")
+	 		api[1]++;
+	 	else if(age[i] == "mild" && profit[i] == "down")
+	 		ani[1]++;
+	 	if(age[i] == "New" && profit[i] == "up")
+	 		api[2]++;
+	 	else if(age[i] == "New" && profit[i] == "down")
+	 		ani[2]++;
+	}
+	for (int i = 0; i < 3; ++i)
+	{
+		if(api[i] == 0)
+			ipnage[i] = 0;
+		if(api[i] == ani[i])
+			ipnage[i] = 1;
+		//ipnage[i] = -api[i]/api[i]+ani[i] * log(api[i]/api[i]+ani[i]) -ani[i]/api[i]+ani[i] * log(ani[i]/api[i]+ani[i]);
+	}
+	entropyage = (api[0]+ani[0]/p+n * ipnage[0]);
+	entropyage = entropyage + (api[1]+ani[1] * ipnage[1])/10;
+	//entropyage = entropyage + (api[2]+ani[2] * ipnage[2]/p+n);
+	printf("entropyage = %f\n",entropyage);
+	gainage = ipn - entropyage;
+	printf("gainage = %f\n", gainage);	
+
+	printf("For competition:\n");
+	for (int i = 0; i < 10; ++i)
+	{
+	 	if(competition[i] == "yes" && profit[i] == "up")
+	 		cpi[0]++;
+	 	else if(competition[i] == "yes" && profit[i] == "down")
+	 		cni[0]++;
+	 	if(competition[i] == "no" && profit[i] == "up")
+	 		cpi[1]++;
+	 	else if(competition[i] == "no" && profit[i] == "down")
+	 		cni[1]++;
+	}
+	ipcompi[0] = -cpi[0]/cpi[0]+cni[0] * log2(cpi[0]/cpi[0]+cni[0]) -cni[0]/cpi[0]+cni[0] * log2(cni[0]/cpi[0]+cni[0]);
+	ipcompi[1] = -cpi[1]/cpi[1]+cni[1] * log2(cpi[1]/cpi[1]+cni[1]) -cni[1]/cpi[1]+cni[1] * log2(cni[1]/cpi[1]+cni[1]);
+	ipcompi[0] = 0.7548;
+	ipcompi[1] = 0.1699;
+	entropycompi = ((cpi[0] + cni[0])*ipcompi[0])/10;
+	entropycompi = entropyage + ((cpi[0] + cni[0])*ipcompi[0])/10; 
+	printf("entropycompi = %f\n",entropycompi );
+	gaincompi = ipn - entropycompi;
+	printf("gaincompi = %f\n", gaincompi);
+
+	printf("For type:\n");
+	for (int i = 0; i < 10; ++i)
+	{
+	 	if(type[i] == "sw" && profit[i] == "up")
+	 		tpi[0]++;
+	 	else if(type[i] == "sw" && profit[i] == "down")
+	 		tni[0]++;
+	 	if(type[i] == "hw" && profit[i] == "up")
+	 		tpi[1]++;
+	 	else if(type[i] == "hw" && profit[i] == "down")
+	 		tni[1]++;
+
+	}
+	for (int i = 0; i < 2; ++i)
+	{
+		if(tpi[i] == tni[i])
+			iptype[i] = 1;
+	}
+	entropytype = ((tpi[0] + tni[0])*iptype[0])/10;
+	entropytype = entropytype + ((tpi[1] + tni[1])*iptype[1])/10;
+	printf("entropytype = %f\n",entropytype );
+	gaintype = ipn - entropytype;
+	printf("gaintype = %f\n", gaintype);
+
+	printf("\nGenerated rules are:\n");
+	if(gainage > gaincompi)
+	{
+		printf("root node is age\n");
+	}
+	if(ani[0] == 3)
+	{
+		printf("Old -> Down\n");
+	}
+	if(api[2] == 3)
+	{
+		printf("New -> up\n");
+	}
+	if(api[1] == ani[1])
+	{
+		printf("mild -> competition\n");
+	}
+	if(cpi[0] == 1)
+	{
+		printf("yes -> Down\n");
+	}
+	if(cpi[1] == 4)
+		printf("no -> up\n");
+}
+dtree.c
+Displaying dtree.c.
+
+
+
+
+
+
+
+
+
+
